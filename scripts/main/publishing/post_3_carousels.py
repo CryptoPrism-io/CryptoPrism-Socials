@@ -48,9 +48,9 @@ class ThreeCarouselPoster:
         self.post_results = []
 
     def load_session_bypass(self) -> bool:
-        """Load Instagram session using bypass validation"""
+        """Load Instagram session using smart client (loads session or creates fresh login)"""
         try:
-            logger.info("🔄 Loading Instagram session with bypass validation...")
+            logger.info("🔄 Loading Instagram session with smart client...")
 
             session_manager = InstagramSessionManager(
                 session_file=self.session_file,
@@ -58,13 +58,14 @@ class ThreeCarouselPoster:
                 password=os.getenv('INSTAGRAM_PASSWORD')
             )
 
-            self.client = session_manager.get_client_bypass_validation()
+            self.client = session_manager.get_smart_client()
 
             if self.client:
-                logger.info("✅ Session loaded successfully using bypass method!")
+                logger.info("✅ Session loaded successfully!")
                 return True
             else:
-                logger.error("❌ Failed to load session")
+                logger.error("❌ Failed to authenticate with Instagram")
+                logger.error("💡 Check your INSTAGRAM_USERNAME and INSTAGRAM_PASSWORD environment variables")
                 return False
 
         except Exception as e:

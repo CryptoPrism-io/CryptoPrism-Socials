@@ -57,7 +57,7 @@ class CarouselPoster:
             True if session loaded successfully, False otherwise
         """
         try:
-            logger.info("🔄 Loading Instagram session with bypass validation...")
+            logger.info("🔄 Loading Instagram session with smart client...")
 
             # Initialize session manager
             session_manager = InstagramSessionManager(
@@ -66,14 +66,15 @@ class CarouselPoster:
                 password=os.getenv('INSTAGRAM_PASSWORD')
             )
 
-            # Use bypass validation method to avoid user_info bug
-            self.client = session_manager.get_client_bypass_validation()
+            # Use smart client (loads session or creates fresh login)
+            self.client = session_manager.get_smart_client()
 
             if self.client:
-                logger.info("✅ Session loaded successfully using bypass method!")
+                logger.info("✅ Session loaded successfully!")
                 return True
             else:
-                logger.error("❌ Failed to load session with bypass method")
+                logger.error("❌ Failed to authenticate with Instagram")
+                logger.error("💡 Check your INSTAGRAM_USERNAME and INSTAGRAM_PASSWORD environment variables")
                 return False
 
         except Exception as e:

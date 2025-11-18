@@ -247,8 +247,13 @@ class StoryTeaserPoster:
                 session_file="data/instagram_session.json"
             )
 
-            # Get Instagram client
-            client = session_mgr.get_client_bypass_validation()
+            # Get Instagram client (loads session or creates fresh login)
+            client = session_mgr.get_smart_client()
+
+            if not client:
+                print("\n❌ Failed to authenticate with Instagram")
+                print("💡 Check your INSTAGRAM_USERNAME and INSTAGRAM_PASSWORD environment variables")
+                return False
 
             print(f"👤 Logged in as: {client.username}")
 

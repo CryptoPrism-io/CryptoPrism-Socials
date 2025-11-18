@@ -34,7 +34,6 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent))
 load_dotenv()
 
 from scripts.main.publishing.session_manager import InstagramSessionManager
-from scripts.main.content.openrouter_client import OpenRouterClient
 
 # Import all generator functions
 sys.path.insert(0, str(Path(__file__).parent.parent / 'individual_posts'))
@@ -127,7 +126,12 @@ def generate_ai_caption(slides_count=14):
     print("\n🤖 Generating AI Caption...")
 
     try:
-        client = OpenRouterClient()
+        import requests
+
+        api_key = os.getenv('OPENROUTER_API_KEY')
+        if not api_key:
+            print("⚠️  No OPENROUTER_API_KEY found, using default caption")
+            return _get_default_caption()
 
         prompt = f"""Generate a compelling Instagram caption for a {slides_count}-slide crypto market analysis carousel.
 
@@ -153,20 +157,38 @@ Example structure:
 
 #CryptoAnalysis #Bitcoin #Trading #MarketData #CryptoInvesting"""
 
-        caption = client.generate_caption(
-            model="openai/gpt-4o-mini",
-            prompt=prompt
-        )
+        url = "https://openrouter.ai/api/v1/chat/completions"
+        headers = {
+            "Authorization": f"Bearer {api_key}",
+            "Content-Type": "application/json"
+        }
 
-        print(f"✅ AI Caption Generated:\n{caption}\n")
-        return caption
+        data = {
+            "model": "openai/gpt-4o-mini",
+            "messages": [{"role": "user", "content": prompt}],
+            "max_tokens": 500,
+            "temperature": 0.7
+        }
+
+        response = requests.post(url, headers=headers, json=data, timeout=30)
+
+        if response.status_code == 200:
+            result = response.json()
+            caption = result['choices'][0]['message']['content'].strip()
+            print(f"✅ AI Caption Generated:\n{caption}\n")
+            return caption
+        else:
+            print(f"⚠️  AI API failed ({response.status_code}), using default caption")
+            return _get_default_caption()
 
     except Exception as e:
         print(f"⚠️  AI caption generation failed: {str(e)}")
         print("📝 Using default caption...")
+        return _get_default_caption()
 
-        # Fallback caption
-        return """Your complete crypto market intelligence for today. 14 slides covering Bitcoin analysis, trading opportunities, market movers, and top cryptocurrencies with data-driven insights.
+def _get_default_caption():
+    """Get default fallback caption"""
+    return """Your complete crypto market intelligence for today. 14 slides covering Bitcoin analysis, trading opportunities, market movers, and top cryptocurrencies with data-driven insights.
 
 Follow @cryptoprism.io for daily market updates.
 
@@ -196,7 +218,18 @@ def post_to_instagram(slide_paths, caption):
         # Get Instagram client (bypass validation for stale sessions)
         client = session_mgr.get_client_bypass_validation()
 
+        if not client:
+            print("\n❌ Failed to load Instagram session")
+            print("💡 Try creating a new session: python scripts/auth/create_instagram_session.py")
+            return False
+
         print(f"👤 Logged in as: {client.username}")
+
+        # Validate images exist
+        for img_path in slide_paths:
+            if not os.path.exists(img_path):
+                print(f"❌ Image not found: {img_path}")
+                return False
 
         # Post carousel
         print(f"\n🚀 Uploading {len(slide_paths)} slides to Instagram...")

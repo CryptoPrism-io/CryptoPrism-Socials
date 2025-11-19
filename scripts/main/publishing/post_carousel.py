@@ -66,8 +66,8 @@ class CarouselPoster:
                 password=os.getenv('INSTAGRAM_PASSWORD')
             )
 
-            # Use smart client (loads session or creates fresh login)
-            self.client = session_manager.get_smart_client()
+            # Use smart client (loads existing session only, no fresh login)
+            self.client = session_manager.get_client_bypass_validation()
 
             if self.client:
                 logger.info("✅ Session loaded successfully!")

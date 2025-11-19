@@ -247,15 +247,17 @@ class StoryTeaserPoster:
                 session_file="data/instagram_session.json"
             )
 
-            # Get Instagram client (loads session or creates fresh login)
-            client = session_mgr.get_smart_client()
+            # Get Instagram client (loads existing session only, no fresh login)
+            client = session_mgr.get_client_bypass_validation()
 
             if not client:
-                print("\n❌ Failed to authenticate with Instagram")
-                print("💡 Check your INSTAGRAM_USERNAME and INSTAGRAM_PASSWORD environment variables")
+                print("\n❌ Failed to load Instagram session from data/instagram_session.json")
+                print("💡 Session file may be expired. Refresh it locally:\n   python scripts/auth/create_instagram_session.py")
                 return False
 
-            print(f"👤 Logged in as: {client.username}")
+            # Note: client.username may be None but client still works
+            username = getattr(client, 'username', 'session_user')
+            print(f"👤 Logged in as: {username}")
 
             # Post story
             print("🚀 Uploading story...")

@@ -156,12 +156,12 @@ def post_bitcoin_story_to_instagram(image_path):
     # Initialize session manager
     session_mgr = InstagramSessionManager(session_file=str(SESSION_FILE))
 
-    # Get client (loads session or creates fresh login)
-    client = session_mgr.get_smart_client()
+    # Get client (loads existing session only, no fresh login)
+    client = session_mgr.get_client_bypass_validation()
 
     if not client:
-        print("❌ Failed to authenticate with Instagram")
-        print("💡 Check your INSTAGRAM_USERNAME and INSTAGRAM_PASSWORD environment variables")
+        print("❌ Failed to load Instagram session from data/instagram_session.json")
+        print("💡 Session file may be expired. Refresh it locally:\n   python scripts/auth/create_instagram_session.py")
         return
 
     # Upload story

@@ -1,23 +1,23 @@
 {
   "session_data": {
     "uuids": {
-      "phone_id": "933d73ca-cc49-42d1-9d21-f36f12d80b7d",
-      "uuid": "16bfacf3-6c64-4b40-a0fd-7acac633cbb4",
-      "client_session_id": "455339bb-9ed9-430d-9a54-98e469fbdfdf",
-      "advertising_id": "80342a19-c671-4513-95c5-f4dae1072a7c",
-      "android_device_id": "android-bcf0566e2aea5d11",
-      "request_id": "d4219c7f-3425-4cdb-b21d-1ed24f808007",
-      "tray_session_id": "7f50b693-f69b-42fe-965f-289e2ac721e8"
+      "phone_id": "6a2692b8-2abd-4b8e-ae3d-525145c7abf8",
+      "uuid": "d152345b-e076-4c8c-9e29-d996027f1b18",
+      "client_session_id": "66f1becc-ac66-4a69-a8db-a6339588e0ad",
+      "advertising_id": "02bfa04d-1207-44fa-ad4c-aa45af50cbb6",
+      "android_device_id": "android-09fb7e0858a45b9b",
+      "request_id": "9b9d030d-b44a-4589-b749-4268b37703ce",
+      "tray_session_id": "9c85fb25-5fc0-4b27-83ba-82286c59fcc9"
     },
-    "mid": "aPMt4AABAAHe2FewSaYt0CT6cUa-",
+    "mid": "aSCbEgABAAEiYfwvlZETeKVcdaoI",
     "ig_u_rur": null,
     "ig_www_claim": null,
     "authorization_data": {
       "ds_user_id": "68833054498",
-      "sessionid": "68833054498%3AX5aFtJNcOVM67N%3A23%3AAYh-bgAwlt5VtNd4xfZtKNIJNSCHj1wsrx3poouybA"
+      "sessionid": "68833054498%3A43MVhyZycuoxSR%3A27%3AAYjDo9NGlnMMkiCTnvqII0b87V6c70IQJf_oeobqEw"
     },
     "cookies": {},
-    "last_login": 1760767516.5616074,
+    "last_login": 1763744552.4372606,
     "device_settings": {
       "app_version": "269.0.0.18.75",
       "android_version": 26,
@@ -37,19 +37,19 @@
     "timezone_offset": -14400
   },
   "metadata": {
-    "created_at": "2025-10-18T11:35:16.576307",
-    "last_updated": "2025-10-18T11:35:16.576307",
-    "last_fresh_login": "2025-10-18T11:35:16.576307",
-    "last_validated": "2025-10-25T12:49:56.775808",
+    "created_at": "2025-11-21T22:32:32.468577",
+    "last_updated": "2025-11-21T22:32:32.468577",
+    "last_fresh_login": "2025-11-21T22:32:32.468577",
+    "last_validated": "2025-11-21T22:32:52.890110",
     "login_count": 1,
     "device_uuids": {
-      "phone_id": "933d73ca-cc49-42d1-9d21-f36f12d80b7d",
-      "uuid": "16bfacf3-6c64-4b40-a0fd-7acac633cbb4",
-      "client_session_id": "455339bb-9ed9-430d-9a54-98e469fbdfdf",
-      "advertising_id": "80342a19-c671-4513-95c5-f4dae1072a7c",
-      "android_device_id": "android-bcf0566e2aea5d11",
-      "request_id": "d4219c7f-3425-4cdb-b21d-1ed24f808007",
-      "tray_session_id": "7f50b693-f69b-42fe-965f-289e2ac721e8"
+      "phone_id": "6a2692b8-2abd-4b8e-ae3d-525145c7abf8",
+      "uuid": "d152345b-e076-4c8c-9e29-d996027f1b18",
+      "client_session_id": "66f1becc-ac66-4a69-a8db-a6339588e0ad",
+      "advertising_id": "02bfa04d-1207-44fa-ad4c-aa45af50cbb6",
+      "android_device_id": "android-09fb7e0858a45b9b",
+      "request_id": "9b9d030d-b44a-4589-b749-4268b37703ce",
+      "tray_session_id": "9c85fb25-5fc0-4b27-83ba-82286c59fcc9"
     },
     "username": "cryptoprism.io",
     "session_version": "1.0"

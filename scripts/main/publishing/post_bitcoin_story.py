@@ -29,6 +29,10 @@ import locale
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 print("Unicode support: UTF-8 encoding enabled globally")
 
+# Enable logging for debugging
+import logging
+logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
+
 # Project paths
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
 TEMPLATES_DIR = PROJECT_ROOT / "base_templates"
@@ -159,6 +163,12 @@ def post_bitcoin_story_to_instagram(image_path):
     # Get client (bypass validation for stale sessions)
     client = session_mgr.get_client_bypass_validation()
 
+    if not client:
+        print("❌ Failed to load Instagram session")
+        print("💡 Session file may be invalid or expired")
+        print("💡 Try creating a new session: python scripts/auth/ensure_session.py")
+        return None
+
     # Upload story
     media = client.photo_upload_to_story(
         path=str(image_path)
@@ -181,7 +191,11 @@ async def main():
         # Step 3: Post to Instagram
         media = post_bitcoin_story_to_instagram(image_file)
 
-        print("🎉 Bitcoin Intelligence Story posted successfully!")
+        if media:
+            print("🎉 Bitcoin Intelligence Story posted successfully!")
+        else:
+            print("❌ Failed to post Bitcoin Intelligence Story")
+            sys.exit(1)
 
     except Exception as e:
         print(f"❌ Error: {e}")

@@ -27,7 +27,7 @@ class InstagramSessionManager:
                  session_file: str = "instagram_session.json",
                  username: Optional[str] = None,
                  password: Optional[str] = None,
-                 session_max_age_days: int = 30):
+                 session_max_age_days: int = 365):
         """
         Initialize Instagram session manager.
 
@@ -35,7 +35,7 @@ class InstagramSessionManager:
             session_file: Path to session storage file
             username: Instagram username (from env vars)
             password: Instagram password (from env vars)
-            session_max_age_days: Maximum session age before refresh (default: 30 days)
+            session_max_age_days: Maximum session age before refresh (default: 365 days)
         """
         self.session_file = Path(session_file)
         self.session_file.parent.mkdir(parents=True, exist_ok=True)

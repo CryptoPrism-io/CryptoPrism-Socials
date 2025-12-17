@@ -14,13 +14,57 @@ from instagrapi import Client
 load_dotenv()
 
 def ensure_session():
-    """Ensure Instagram session file exists"""
+    """Ensure Instagram session file exists with proper format"""
+    import json
+    from datetime import datetime
+
     session_file = Path("data/instagram_session.json")
 
     # Check if session already exists
     if session_file.exists():
         print("✅ Instagram session file already exists")
         print(f"📁 Location: {session_file}")
+
+        # Validate session format and fix if needed
+        try:
+            with open(session_file, 'r') as f:
+                session_data = json.load(f)
+
+            # Check if it has metadata wrapper
+            if 'metadata' not in session_data or 'session_data' not in session_data:
+                print("⚠️  Session file missing metadata wrapper - fixing format...")
+
+                # Wrap existing session with metadata
+                wrapped_session = {
+                    'metadata': {
+                        'created_at': datetime.now().isoformat(),
+                        'last_validated': datetime.now().isoformat(),
+                        'last_fresh_login': datetime.now().isoformat(),
+                        'username': session_data.get('username', os.getenv('INSTAGRAM_USERNAME')),
+                        'login_count': 1,
+                        'device_uuids': session_data.get('uuids', {}),
+                        'session_version': '1.0'
+                    },
+                    'session_data': session_data
+                }
+
+                # Save fixed session
+                with open(session_file, 'w') as f:
+                    json.dump(wrapped_session, f, indent=2)
+
+                # Also update backup
+                backup_session = Path("sessions/instagram_session.json")
+                backup_session.parent.mkdir(parents=True, exist_ok=True)
+                with open(backup_session, 'w') as f:
+                    json.dump(wrapped_session, f, indent=2)
+
+                print("✅ Session format fixed with metadata wrapper")
+            else:
+                print("✅ Session format is correct (has metadata wrapper)")
+
+        except Exception as e:
+            print(f"⚠️  Could not validate session format: {e}")
+
         return True
 
     print("📁 No session file found - creating new session")

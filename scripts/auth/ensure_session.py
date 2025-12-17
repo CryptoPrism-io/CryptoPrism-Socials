@@ -49,28 +49,72 @@ def ensure_session():
             else:
                 print("✅ Session format is correct (has metadata wrapper)")
 
-                # Check session age - if too old, recreate
+                # Check session age
                 created_at = session_data.get('metadata', {}).get('created_at')
+                age_days = None
                 if created_at:
                     try:
                         created_time = datetime.fromisoformat(created_at)
                         age_days = (datetime.now() - created_time).days
+                        print(f"📅 Session age: {age_days} days")
 
                         if age_days > 30:
-                            print(f"⚠️  Session is {age_days} days old (too old)")
+                            print(f"⚠️  Session too old (>{age_days} days)")
                             print("🔄 Deleting and creating fresh session...")
                             session_file.unlink()
                             if backup_session.exists():
                                 backup_session.unlink()
                             # Fall through to create new session
-                        else:
-                            print(f"✅ Session age: {age_days} days (acceptable)")
-                            return True
                     except Exception as e:
                         print(f"⚠️  Could not parse session age: {e}")
+
+                # CRITICAL: Test if session actually works with Instagram API
+                print("🔍 Testing if session is valid with Instagram API...")
+                try:
+                    from instagrapi import Client
+                    from instagrapi.exceptions import LoginRequired, ClientError
+
+                    # Load session and test it
+                    test_client = Client()
+                    test_client.delay_range = [1, 2]
+
+                    # Extract raw session data for testing
+                    temp_file = session_file.with_suffix('.test.tmp')
+                    with open(temp_file, 'w') as f:
+                        json.dump(session_data['session_data'], f)
+
+                    test_client.load_settings(str(temp_file))
+                    temp_file.unlink()
+
+                    # First check: user_id exists
+                    if not hasattr(test_client, 'user_id') or not test_client.user_id:
+                        print("⚠️  Session has no user_id - likely invalid")
+                        raise Exception("Session validation failed - no user_id")
+
+                    # Second check: Make actual API call to verify session works
+                    print(f"🔍 User ID found: {test_client.user_id}")
+                    print("🔍 Making test API call to verify session...")
+
+                    try:
+                        # Try a lightweight API call
+                        test_client.account_info()
+                        print(f"✅ Session is VALID! API test successful")
+                        print(f"✅ Session age: {age_days if age_days is not None else 'unknown'} days (acceptable)")
                         return True
-                else:
-                    return True
+
+                    except (LoginRequired, ClientError) as api_error:
+                        print(f"❌ Instagram API rejected session: {api_error}")
+                        raise Exception(f"Session rejected by Instagram API: {api_error}")
+
+                except Exception as e:
+                    print(f"❌ Session validation FAILED: {e}")
+                    print(f"🔄 Deleting invalid session (age: {age_days if age_days is not None else 'unknown'} days)...")
+                    session_file.unlink()
+                    backup_session = Path("sessions/instagram_session.json")
+                    if backup_session.exists():
+                        backup_session.unlink()
+                    print("✅ Invalid session deleted - will create fresh session")
+                    # Fall through to create new session
 
         except Exception as e:
             print(f"⚠️  Could not validate session: {e}")

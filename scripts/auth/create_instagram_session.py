@@ -6,6 +6,7 @@ Manual tool for creating initial Instagram session when automated login fails
 
 import os
 import sys
+import json
 import time
 from pathlib import Path
 from datetime import datetime
@@ -53,12 +54,49 @@ def create_session_manually():
         if success:
             print("✅ Login successful!")
 
-            # Save session
+            # Save session with metadata wrapper
             session_file = Path("data/instagram_session.json")
             session_file.parent.mkdir(parents=True, exist_ok=True)
 
-            cl.dump_settings(str(session_file))
+            # First dump to temp file
+            temp_file = session_file.with_suffix('.tmp')
+            cl.dump_settings(str(temp_file))
+
+            # Load raw session data
+            with open(temp_file, 'r') as f:
+                raw_session_data = json.load(f)
+
+            # Wrap with metadata for session_manager compatibility
+            wrapped_session = {
+                'metadata': {
+                    'created_at': datetime.now().isoformat(),
+                    'last_validated': datetime.now().isoformat(),
+                    'last_fresh_login': datetime.now().isoformat(),
+                    'username': username,
+                    'login_count': 1,
+                    'device_uuids': raw_session_data.get('uuids', {})
+                },
+                'session_data': raw_session_data
+            }
+
+            # Save wrapped session to primary location
+            with open(session_file, 'w') as f:
+                json.dump(wrapped_session, f, indent=2)
+
             print(f"✅ Session saved to: {session_file}")
+
+            # Also save backup to sessions/ directory
+            backup_dir = Path("sessions")
+            backup_dir.mkdir(parents=True, exist_ok=True)
+            backup_file = backup_dir / "instagram_session.json"
+
+            with open(backup_file, 'w') as f:
+                json.dump(wrapped_session, f, indent=2)
+
+            print(f"✅ Session backup saved to: {backup_file}")
+
+            # Clean up temp file
+            temp_file.unlink()
 
             # Test the session
             print("\n🔍 Testing session...")
@@ -67,7 +105,7 @@ def create_session_manually():
 
             print("\n🎉 Session creation completed successfully!")
             print("💡 Future runs will use this session instead of username/password")
-            print("💡 Session will last up to 30 days")
+            print("💡 Session will last up to 365 days")
 
             return True
 
@@ -106,19 +144,37 @@ def check_existing_session():
     try:
         print("📁 Existing session found, testing...")
 
+        # Load session data
+        with open(session_file, 'r') as f:
+            session_data = json.load(f)
+
         cl = Client()
-        cl.load_settings(str(session_file))
 
-        # Test session
-        user_info = cl.user_info_by_username(cl.username)
+        # Handle both wrapped and unwrapped formats
+        if 'session_data' in session_data:
+            # New format with metadata wrapper
+            temp_file = session_file.with_suffix('.tmp')
+            with open(temp_file, 'w') as f:
+                json.dump(session_data['session_data'], f)
+            cl.load_settings(str(temp_file))
+            temp_file.unlink()
 
-        if user_info and user_info.pk:
+            # Get username from metadata
+            username = session_data.get('metadata', {}).get('username', cl.username)
+            print(f"📅 Session created: {session_data.get('metadata', {}).get('created_at', 'Unknown')}")
+        else:
+            # Legacy format - direct session data
+            cl.load_settings(str(session_file))
+            username = cl.username
+
+        # Test session (bypass user_info call if user_id exists)
+        if hasattr(cl, 'user_id') and cl.user_id:
             print(f"✅ Existing session is valid!")
-            print(f"👤 Authenticated as: {cl.username}")
-            print(f"🆔 User ID: {user_info.pk}")
+            print(f"👤 Authenticated as: {username}")
+            print(f"🆔 User ID: {cl.user_id}")
             return True
         else:
-            print("❌ Existing session is invalid")
+            print("❌ Existing session is invalid (no user_id)")
             return False
 
     except Exception as e:

@@ -2,10 +2,15 @@
 """
 Ensure Instagram session exists - create if missing
 For GitHub Actions: checks if session file exists, creates if not
+
+Supports INSTAGRAM_SESSION_B64 env var for GitHub Actions:
+- Set this secret with base64-encoded session JSON
+- Avoids login from GitHub Actions (blocked due to IP blacklisting)
 """
 
 import os
 import sys
+import base64
 from pathlib import Path
 from dotenv import load_dotenv
 from instagrapi import Client
@@ -13,12 +18,75 @@ from instagrapi import Client
 # Load environment variables
 load_dotenv()
 
+
+def restore_session_from_secret():
+    """
+    Restore session from INSTAGRAM_SESSION_B64 environment variable.
+    Returns True if session was restored, False otherwise.
+    """
+    session_b64 = os.getenv('INSTAGRAM_SESSION_B64')
+    if not session_b64:
+        return False
+
+    print("🔑 Found INSTAGRAM_SESSION_B64 secret - restoring session...")
+
+    try:
+        import json
+
+        # Decode base64 session
+        session_json = base64.b64decode(session_b64).decode('utf-8')
+        session_data = json.loads(session_json)
+
+        # Validate structure
+        if 'session_data' not in session_data or 'metadata' not in session_data:
+            print("❌ Invalid session format in INSTAGRAM_SESSION_B64")
+            return False
+
+        # Write to session file
+        session_file = Path("data/instagram_session.json")
+        session_file.parent.mkdir(parents=True, exist_ok=True)
+
+        with open(session_file, 'w') as f:
+            json.dump(session_data, f, indent=2)
+
+        print(f"✅ Session restored from secret to: {session_file}")
+
+        # Also write to backup location
+        backup_file = Path("sessions/instagram_session.json")
+        backup_file.parent.mkdir(parents=True, exist_ok=True)
+        with open(backup_file, 'w') as f:
+            json.dump(session_data, f, indent=2)
+
+        print(f"✅ Backup session saved to: {backup_file}")
+
+        # Validate the restored session
+        username = session_data.get('metadata', {}).get('username', 'unknown')
+        created_at = session_data.get('metadata', {}).get('created_at', 'unknown')
+        print(f"👤 Session for: {username}")
+        print(f"📅 Created: {created_at}")
+
+        return True
+
+    except Exception as e:
+        print(f"❌ Failed to restore session from secret: {e}")
+        return False
+
+
 def ensure_session():
     """Ensure Instagram session file exists with proper format"""
     import json
     from datetime import datetime
 
     session_file = Path("data/instagram_session.json")
+
+    # FIRST: Try to restore session from INSTAGRAM_SESSION_B64 secret
+    # This is critical for GitHub Actions where direct login is blocked
+    if os.getenv('INSTAGRAM_SESSION_B64'):
+        if restore_session_from_secret():
+            print("✅ Session restored from GitHub secret")
+            # Continue to validate the restored session below
+        else:
+            print("⚠️ Failed to restore from secret, will try other methods")
 
     # Check if session already exists
     if session_file.exists():

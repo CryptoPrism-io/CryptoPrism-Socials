@@ -52,6 +52,7 @@ jobs:
         PYTHONIOENCODING: utf-8
         INSTAGRAM_USERNAME: ${{ secrets.INSTAGRAM_USERNAME }}
         INSTAGRAM_PASSWORD: ${{ secrets.INSTAGRAM_PASSWORD }}
+        INSTAGRAM_SESSION_B64: ${{ secrets.INSTAGRAM_SESSION_B64 }}
 
     - name: Post Long Calls Story
       run: python scripts/main/publishing/post_long_calls_story.py

@@ -178,6 +178,17 @@ def post_trading_story_to_instagram(image_path):
     # Get client (bypass validation for stale sessions)
     client = session_mgr.get_client_bypass_validation()
 
+    if not client:
+        print("❌ Failed to load Instagram session")
+        print("💡 Session file may be invalid or expired")
+        print("💡 Attempting fresh login...")
+
+        # Try fresh login as fallback
+        client = session_mgr.get_smart_client()
+
+        if not client:
+            raise Exception("Failed to authenticate with Instagram - both bypass and fresh login failed")
+
     # Upload story
     media = client.photo_upload_to_story(
         path=str(image_path)

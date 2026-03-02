@@ -1,9 +1,7 @@
 name: Instagram Story - Short Calls
 
 on:
-  schedule:
-    - cron: "30 5 * * *"  # Daily at 05:30 UTC (1 hour after Long Calls Story)
-  workflow_dispatch: {}  # Allow manual trigger
+  workflow_dispatch: {}  # DISABLED: legacy workflow - manual trigger only
 
 jobs:
   post_short_calls_story:

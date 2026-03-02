@@ -2,9 +2,7 @@
 name: Google Sheets Update
 
 on:
-  schedule:
-    - cron: "31 0 * * *"  # Daily at 00:30 UTC
-  workflow_dispatch: {}
+  workflow_dispatch: {}  # DISABLED: legacy workflow - manual trigger only
 
 jobs:
   update_gsheets:

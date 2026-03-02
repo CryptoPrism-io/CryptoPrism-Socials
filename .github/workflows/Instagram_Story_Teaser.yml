@@ -1,9 +1,7 @@
 name: Instagram Story Teaser Post
 
 on:
-  schedule:
-    - cron: "30 2 * * *"  # Daily at 02:30 UTC (30 min after mega-carousel)
-  workflow_dispatch: {}  # Allow manual trigger
+  workflow_dispatch: {}  # DISABLED: legacy workflow - manual trigger only
 
 jobs:
   post_story_teaser:

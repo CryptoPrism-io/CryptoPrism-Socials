@@ -1,9 +1,7 @@
 name: Instagram Story - Bitcoin Intelligence
 
 on:
-  schedule:
-    - cron: "30 3 * * *"  # Daily at 03:30 UTC (1 hour after Story Teaser)
-  workflow_dispatch: {}  # Allow manual trigger
+  workflow_dispatch: {}  # DISABLED: legacy workflow - manual trigger only
 
 jobs:
   post_bitcoin_story:

@@ -1,9 +1,7 @@
 name: Instagram Story - Long Calls
 
 on:
-  schedule:
-    - cron: "30 4 * * *"  # Daily at 04:30 UTC (1 hour after Bitcoin Story)
-  workflow_dispatch: {}  # Allow manual trigger
+  workflow_dispatch: {}  # DISABLED: legacy workflow - manual trigger only
 
 jobs:
   post_long_calls_story:

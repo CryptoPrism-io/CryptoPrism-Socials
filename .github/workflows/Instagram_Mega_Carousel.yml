@@ -1,9 +1,7 @@
 name: Instagram Mega-Carousel Daily Post
 
 on:
-  schedule:
-    - cron: "0 2 * * *"  # Daily at 02:00 UTC
-  workflow_dispatch: {}  # Allow manual trigger
+  workflow_dispatch: {}  # DISABLED: legacy workflow - manual trigger only
 
 jobs:
   generate_and_post_mega_carousel:

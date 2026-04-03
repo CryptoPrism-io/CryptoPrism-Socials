@@ -88,8 +88,11 @@ class TestPathStructure:
     def test_template_file_discovery(self):
         """Test that template files can be properly discovered."""
         templates = config.paths.get_template_files()
-        expected_html_files = len([f for f in config.paths.templates_dir.iterdir()
-                                 if f.suffix == '.html' and f.stem.isdigit()])
+        html_files = [
+            f for f in config.paths.templates_dir.iterdir()
+            if f.suffix == '.html' and f.stem.isdigit()
+        ]
+        expected_html_files = len(html_files)
 
         assert len(templates) == expected_html_files
 
@@ -150,7 +153,10 @@ class TestPathIntegration:
         """Test Jinja2 compatibility with template files."""
         try:
             from jinja2 import Environment, FileSystemLoader
-            env = Environment(loader=FileSystemLoader(str(config.paths.templates_dir)))
+            loader = FileSystemLoader(
+                str(config.paths.templates_dir)
+            )
+            env = Environment(loader=loader)
 
             # Try to load a template
             template = env.get_template("1.html")

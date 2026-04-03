@@ -8,10 +8,11 @@ from pathlib import Path
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
-from config.paths import (
-    TEMPLATES_DIR, STYLES_DIR, HTML_OUTPUT_DIR, IMAGES_OUTPUT_DIR,
+from config.paths import (  # noqa: E402
+    TEMPLATES_DIR, STYLES_DIR,
     get_html_output_path, get_image_output_path, ensure_directories
 )
+
 
 def test_file_structure():
     """Test that all files are in their correct locations."""
@@ -27,13 +28,17 @@ def test_file_structure():
             print(f"! Template missing: {template_file}")
 
     # Check CSS files exist
-    css_files = ['style.css', 'style2.css', 'style3.css', 'style4.css', 'style5.css']
+    css_files = [
+        'style.css', 'style2.css', 'style3.css',
+        'style4.css', 'style5.css',
+    ]
     for css_file in css_files:
         css_path = STYLES_DIR / css_file
         if css_path.exists():
             print(f"+ CSS found: {css_file}")
         else:
             print(f"! CSS missing: {css_file}")
+
 
 def test_template_css_references():
     """Test that templates correctly reference CSS files."""
@@ -52,11 +57,18 @@ def test_template_css_references():
         if template_path.exists():
             content = template_path.read_text(encoding='utf-8')
             if expected_css in content:
-                print(f"+ {template_file} correctly references {expected_css}")
+                print(
+                    f"+ {template_file} correctly "
+                    f"references {expected_css}"
+                )
             else:
-                print(f"! {template_file} missing reference to {expected_css}")
+                print(
+                    f"! {template_file} missing "
+                    f"reference to {expected_css}"
+                )
         else:
             print(f"! Template file not found: {template_file}")
+
 
 def test_jinja_template_loading():
     """Test that Jinja2 can load templates from new structure."""
@@ -65,19 +77,26 @@ def test_jinja_template_loading():
     try:
         from jinja2 import Environment, FileSystemLoader
 
-        env = Environment(loader=FileSystemLoader(str(TEMPLATES_DIR)))
+        env = Environment(
+            loader=FileSystemLoader(str(TEMPLATES_DIR))
+        )
 
         # Try to load each template
-        template_files = ['1.html', '2.html', '3.html', '4.html', '5.html']
+        template_files = [
+            '1.html', '2.html', '3.html', '4.html', '5.html',
+        ]
         for template_file in template_files:
             try:
-                template = env.get_template(template_file)
-                print(f"+ Successfully loaded template: {template_file}")
+                env.get_template(template_file)
+                print(f"+ Successfully loaded: {template_file}")
             except Exception as e:
-                print(f"! Failed to load template {template_file}: {e}")
+                print(
+                    f"! Failed to load {template_file}: {e}"
+                )
 
     except ImportError:
-        print("! Jinja2 not available (expected in local environment)")
+        print("! Jinja2 not available (expected in local env)")
+
 
 def test_output_paths():
     """Test that output path generation works correctly."""
@@ -95,29 +114,42 @@ def test_output_paths():
 
         # Check directories exist
         if html_path.parent.exists():
-            print(f"+ HTML output directory exists: {html_path.parent}")
+            print(
+                f"+ HTML output dir exists: "
+                f"{html_path.parent}"
+            )
         else:
-            print(f"! HTML output directory missing: {html_path.parent}")
+            print(
+                f"! HTML output dir missing: "
+                f"{html_path.parent}"
+            )
 
         if image_path.parent.exists():
-            print(f"+ Image output directory exists: {image_path.parent}")
+            print(
+                f"+ Image output dir exists: "
+                f"{image_path.parent}"
+            )
         else:
-            print(f"! Image output directory missing: {image_path.parent}")
+            print(
+                f"! Image output dir missing: "
+                f"{image_path.parent}"
+            )
+
 
 def main():
     """Run all validation tests."""
-    print("="*60)
+    print("=" * 60)
     print("FINAL REPOSITORY RESTRUCTURE VALIDATION")
-    print("="*60)
+    print("=" * 60)
 
     test_file_structure()
     test_template_css_references()
     test_jinja_template_loading()
     test_output_paths()
 
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("VALIDATION COMPLETE")
-    print("="*60)
+    print("=" * 60)
 
     print("\nRepository restructure summary:")
     print("+ New directory structure created")
@@ -133,6 +165,7 @@ def main():
     print("2. Update GitHub Actions to use restructured scripts")
     print("3. Test deployment with GitHub Actions")
     print("4. Remove old files from root directory")
+
 
 if __name__ == "__main__":
     main()

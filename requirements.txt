@@ -36,3 +36,9 @@ playwright~=1.41
 numpy~=1.26
 matplotlib~=3.8
 seaborn~=0.13
+
+# Testing
+pytest~=8.0
+
+# MySQL connector (used by gsheets_sync.py)
+mysql-connector-python~=8.3

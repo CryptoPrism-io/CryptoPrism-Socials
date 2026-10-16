@@ -840,3 +840,5 @@ Transform your cryptocurrency data into engaging Instagram content through AI-po
 
 <!-- Animated Footer Banner -->
 <img width="100%" src="https://capsule-render.vercel.app/api?type=waving&color=gradient&customColorList=12,15,20,24&height=120&section=footer"/>
+
+_Last reviewed: 2026-10-16_
